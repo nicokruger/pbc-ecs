@@ -11,12 +11,14 @@ function EntityManager(messenger) {
   this._tags = {};
 }
 
-EntityManager.prototype.addSystem = function (Component, func) {
+EntityManager.prototype.addSystem = function (Component, func, before, after) {
   this._systems.push({
-    Component,
-    func
+    Component:Component,
+    func:func,
+    before:before,
+    after:after
   })
-  const name = componentPropertyName(Component);
+  var name = componentPropertyName(Component);
   if (!this._systems[name]) {
     this._systemsPools[name] = new ObjectPool(Component);
     this._systemEntities[name] = [];
@@ -24,16 +26,33 @@ EntityManager.prototype.addSystem = function (Component, func) {
 }
 
 EntityManager.prototype.runSystems = function (dt) {
-  const length = this._systems.length;
-  for (let i = 0; i < length; i++) {
-    const {func, Component} = this._systems[i];
-    const name = componentPropertyName(Component);
-    const ents = this._systemEntities[name];
-    const entsLength = ents.length;
-    for (let j = 0; j < entsLength; j++) {
-      const ent = ents[j];
+  var length = this._systems.length;
+  for (var i = 0; i < length; i++) {
+    var func = this._systems[i].func;
+    var before = this._systems[i].before;
+    var after = this._systems[i].after;
+    var Component = this._systems[i].Component;
+
+    if (before) {
+      before(dt);
+    }
+    if (!func) {
+      if (after) {
+        after(dt);
+      }
+      continue;
+    }
+    var name = componentPropertyName(Component);
+    var ents = this._systemEntities[name];
+    var entsLength = ents.length;
+    for (var j = 0; j < entsLength; j++) {
+      var ent = ents[j];
       func(dt, ent);
     }
+    if (after) {
+      after(dt);
+    }
+
   }
 }
 
@@ -51,6 +70,7 @@ EntityManager.prototype.entityAddComponent = function(entity, Component) {
 
   // Create the reference on the entity to this (aquired) component
   var cName = componentPropertyName(Component);
+  console.log('add', cName);
   var component = this._systemsPools[cName].aquire();
   entity[cName] = component;
 
