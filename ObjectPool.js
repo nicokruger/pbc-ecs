@@ -9,7 +9,7 @@ module.exports = ObjectPool;
 function ObjectPool(T)
 {
   this.freeList = [];
-  this.count    = 10;
+  this.count    = 0;
   this.T        = T;
 }
 
