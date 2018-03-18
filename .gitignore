@@ -1,0 +1,11 @@
+node_modules
+*.log
+.DS_Store
+/dist
+*swp
+*swo
+*swn
+tags
+.nuxt
+.serverless
+libby
