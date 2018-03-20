@@ -47,6 +47,9 @@ EntityManager.prototype.runSystems = function (dt) {
     var entsLength = ents.length;
     for (var j = 0; j < entsLength; j++) {
       var ent = ents[j];
+      if (!ent) {
+        continue;
+      }
       func(dt, ent);
     }
     if (after) {
@@ -70,7 +73,10 @@ EntityManager.prototype.entityAddComponent = function(entity, Component) {
 
   // Create the reference on the entity to this (aquired) component
   var cName = componentPropertyName(Component);
-  console.log('add', cName);
+  //console.log('add', cName);
+  if (!this._systemsPools[cName]) {
+    console.error('dont know system of', cName);
+  }
   var component = this._systemsPools[cName].aquire();
   entity[cName] = component;
 
@@ -134,6 +140,12 @@ EntityManager.prototype.removeEntity = function(entity)
   this._entityPool.release(entity);
 };
 
+EntityManager.prototype.removeAllEntities = function()
+{
+  for (var x = this._entities.length - 1; x >= 0; x--) {
+    this._entities[x].remove();
+  }
+};
 
 /**
  * @param {Entity} entity
