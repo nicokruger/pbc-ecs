@@ -34,7 +34,9 @@ EntityManager.prototype.runSystems = function (dt) {
     var Component = this._systems[i].Component;
 
     if (before) {
-      before(dt);
+      if (before(dt) === false) {
+        continue;
+      };
     }
     if (!func) {
       if (after) {
@@ -50,7 +52,9 @@ EntityManager.prototype.runSystems = function (dt) {
       if (!ent) {
         continue;
       }
-      func(dt, ent);
+      if (func(dt, ent) === false) {
+        continue;
+      }
     }
     if (after) {
       after(dt);
