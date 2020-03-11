@@ -185,6 +185,18 @@ EntityManager.prototype.entityRemoveAllComponents = function(entity)
 };
 
 /**
+ * Get a list of entities that have a certain component.
+ * @param {<Function>} Component
+ * @return {Array.<Entity>}
+ */
+EntityManager.prototype.querySystem = function(Component)
+{
+    var name = componentPropertyName(Component);
+    var ents = this._systemEntities[name];
+    return ents || [];
+};
+
+/**
  * Get a list of entities that all have a certain tag.
  * @param {String} tag
  * @return {Array.<Entity>}
